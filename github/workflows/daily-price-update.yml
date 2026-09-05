@@ -1,0 +1,29 @@
+name: Daily Gold Price Update
+
+on:
+  schedule:
+    # UTC 기준 00:00 = 한국시간 오전 9시
+    - cron: "0 0 * * *"
+  workflow_dispatch: {}   # "Actions" 탭에서 수동으로도 실행 가능
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: 파이썬 설치
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 라이브러리 설치
+        run: pip install -r requirements.txt
+
+      - name: 가격 업데이트 실행
+        env:
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          GOLD_API_SERVICE_KEY: ${{ secrets.GOLD_API_SERVICE_KEY }}
+        run: python update_prices.py
